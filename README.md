@@ -1,2 +1,1 @@
-
-<img width="202" height="148" alt="image" src="https://github.com/user-attachments/assets/b7d2a176-7662-4830-b9ef-d7068a8524a1" />
+<img width="1188" height="899" alt="image" src="https://github.com/user-attachments/assets/f7ecb986-3c25-41c7-a410-866aa78f3c70" /> Se puede evidenciar la pagina web que se he creado esta consiste en un sitio web digirido hacia el area de la salud donde se puede administrar el manejo de citas medicas(agdendar,cancelar, ver listados, modificar,ver lista de paciente, ver lista de medicos) para un centro medico
