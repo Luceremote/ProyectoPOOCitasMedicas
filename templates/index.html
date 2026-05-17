@@ -1,0 +1,338 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard &mdash; MediCitas{% endblock %}
+
+{% block content %}
+
+<!-- Encabezado de página -->
+<div class="page-header mb-4">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <div>
+            <h1 class="page-title">
+                <i class="bi bi-grid-fill me-2 text-primary"></i>Panel Principal
+            </h1>
+            <p class="text-muted mb-0">Gestiona las citas médicas, pacientes y doctores del sistema.</p>
+        </div>
+        <div class="d-flex gap-2 flex-wrap">
+            <a href="{{ url_for('nuevo_paciente') }}" class="btn btn-outline-info px-3">
+                <i class="bi bi-person-plus-fill me-2"></i>Registrar Paciente
+            </a>
+            <a href="{{ url_for('nuevo_doctor') }}" class="btn btn-outline-primary px-3">
+                <i class="bi bi-person-badge-fill me-2"></i>Registrar Doctor
+            </a>
+            <a href="{{ url_for('nueva_cita') }}" class="btn btn-primary px-4">
+                <i class="bi bi-plus-circle-fill me-2"></i>Nueva Cita
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Tarjetas de estadísticas -->
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-lg-3">
+        <div class="stat-card stat-card-total">
+            <div class="stat-icon"><i class="bi bi-calendar3"></i></div>
+            <div class="stat-number">{{ citas|length }}</div>
+            <div class="stat-label">Total de Citas</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="stat-card stat-card-pendiente">
+            <div class="stat-icon"><i class="bi bi-hourglass-split"></i></div>
+            <div class="stat-number">{{ citas|selectattr('estado', 'equalto', 'pendiente')|list|length }}</div>
+            <div class="stat-label">Pendientes</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="stat-card stat-card-confirmada">
+            <div class="stat-icon"><i class="bi bi-check-circle-fill"></i></div>
+            <div class="stat-number">{{ citas|selectattr('estado', 'equalto', 'confirmada')|list|length }}</div>
+            <div class="stat-label">Confirmadas</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="stat-card stat-card-cancelada">
+            <div class="stat-icon"><i class="bi bi-x-circle-fill"></i></div>
+            <div class="stat-number">{{ citas|selectattr('estado', 'equalto', 'cancelada')|list|length }}</div>
+            <div class="stat-label">Canceladas</div>
+        </div>
+    </div>
+</div>
+
+<!-- Tabla de citas -->
+<div class="card shadow-sm mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center py-3">
+        <h5 class="mb-0 fw-semibold">
+            <i class="bi bi-table me-2 text-primary"></i>Listado de Citas
+        </h5>
+        <span class="badge bg-secondary rounded-pill">{{ citas|length }} registros</span>
+    </div>
+    <div class="card-body p-0">
+        {% if citas %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-4 text-muted fw-semibold small">#</th>
+                        <th class="text-muted fw-semibold small">
+                            <i class="bi bi-person me-1"></i>PACIENTE
+                        </th>
+                        <th class="text-muted fw-semibold small">
+                            <i class="bi bi-person-badge me-1"></i>DOCTOR
+                        </th>
+                        <th class="text-muted fw-semibold small">
+                            <i class="bi bi-calendar me-1"></i>FECHA
+                        </th>
+                        <th class="text-muted fw-semibold small">
+                            <i class="bi bi-clock me-1"></i>HORA
+                        </th>
+                        <th class="text-muted fw-semibold small">ESTADO</th>
+                        <th class="text-muted fw-semibold small pe-4">ACCIONES</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cita in citas %}
+                    <tr>
+                        <td class="ps-4 text-muted">{{ loop.index }}</td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="avatar-xs bg-info text-white">
+                                    {{ cita.paciente.nombre[0]|upper }}
+                                </div>
+                                <div>
+                                    <div class="fw-semibold">{{ cita.paciente.nombre }}</div>
+                                    <div class="text-muted small">{{ cita.paciente.eps }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="avatar-xs bg-primary text-white">
+                                    {{ cita.doctor.nombre[0]|upper }}
+                                </div>
+                                <div>
+                                    <div class="fw-semibold">{{ cita.doctor.nombre }}</div>
+                                    <div class="text-muted small">{{ cita.doctor.especialidad }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="text-dark">
+                                <i class="bi bi-calendar-event me-1 text-muted"></i>{{ cita.fecha }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="text-dark">
+                                <i class="bi bi-clock me-1 text-muted"></i>{{ cita.hora }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if cita.estado == 'pendiente' %}
+                                <span class="badge-estado badge-pendiente">
+                                    <i class="bi bi-hourglass-split me-1"></i>Pendiente
+                                </span>
+                            {% elif cita.estado == 'confirmada' %}
+                                <span class="badge-estado badge-confirmada">
+                                    <i class="bi bi-check-circle me-1"></i>Confirmada
+                                </span>
+                            {% else %}
+                                <span class="badge-estado badge-cancelada">
+                                    <i class="bi bi-x-circle me-1"></i>Cancelada
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td class="pe-4">
+                            {% if cita.estado != 'cancelada' %}
+                            <div class="d-flex gap-2">
+                                <a href="{{ url_for('editar_cita', indice=loop.index0) }}"
+                                   class="btn btn-outline-primary btn-sm"
+                                   title="Editar cita">
+                                    <i class="bi bi-pencil me-1"></i>Editar
+                                </a>
+                                <a href="{{ url_for('cancelar_cita', indice=loop.index0) }}"
+                                   class="btn btn-outline-danger btn-sm"
+                                   title="Cancelar cita"
+                                   onclick="return confirm('¿Seguro que deseas cancelar esta cita?')">
+                                    <i class="bi bi-x-lg me-1"></i>Cancelar
+                                </a>
+                            </div>
+                            {% else %}
+                            <span class="text-muted small fst-italic">Sin acciones</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state py-5">
+            <i class="bi bi-calendar-x display-4 text-muted d-block mb-3"></i>
+            <h6 class="text-muted">No hay citas registradas aún</h6>
+            <p class="text-muted small mb-4">Comienza creando la primera cita médica del sistema.</p>
+            <a href="{{ url_for('nueva_cita') }}" class="btn btn-primary px-4">
+                <i class="bi bi-plus-circle-fill me-2"></i>Crear primera cita
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Pacientes y Doctores -->
+<div class="row g-4">
+    <!-- Pacientes -->
+    <div class="col-lg-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-semibold">
+                    <i class="bi bi-people-fill me-2 text-info"></i>Pacientes Registrados
+                    <span class="badge bg-info ms-2">{{ pacientes|length }}</span>
+                </h5>
+                <a href="{{ url_for('nuevo_paciente') }}" class="btn btn-sm btn-outline-info">
+                    <i class="bi bi-plus-lg me-1"></i>Agregar
+                </a>
+            </div>
+            <div class="card-body p-0">
+                {% if pacientes %}
+                <div class="list-group list-group-flush">
+                    {% for paciente in pacientes %}
+                    {% set citas_activas = citas_por_paciente.get(paciente.id, 0) %}
+                    <div class="list-group-item px-4 py-3">
+                        <div class="d-flex align-items-start gap-3">
+                            <div class="avatar-md bg-info text-white flex-shrink-0">
+                                {{ paciente.nombre[0]|upper }}
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="d-flex justify-content-between align-items-start gap-2">
+                                    <div class="fw-semibold">{{ paciente.nombre }}</div>
+                                    <!-- Botón eliminar paciente: POST con confirmación -->
+                                    <form method="post"
+                                          action="{{ url_for('eliminar_paciente', paciente_id=paciente.id) }}"
+                                          class="m-0"
+                                          onsubmit="return confirm(
+                                              '¿Eliminar al paciente {{ paciente.nombre|e }}?' +
+                                              {% if citas_activas > 0 %}
+                                              '\n\nADVERTENCIA: Tiene {{ citas_activas }} cita(s) activa(s) que serán canceladas automáticamente.'
+                                              {% else %}
+                                              '\n\nEsta acción no se puede deshacer.'
+                                              {% endif %}
+                                          );">
+                                        <button type="submit"
+                                                class="btn btn-sm btn-outline-danger"
+                                                title="Eliminar paciente">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                                <div class="info-chips mt-1">
+                                    <span class="info-chip">
+                                        <i class="bi bi-card-text me-1"></i>CC {{ paciente.id }}
+                                    </span>
+                                    <span class="info-chip info-chip-eps">
+                                        <i class="bi bi-shield-plus me-1"></i>{{ paciente.eps }}
+                                    </span>
+                                    {% if citas_activas > 0 %}
+                                    <span class="info-chip info-chip-warning">
+                                        <i class="bi bi-calendar-check me-1"></i>{{ citas_activas }} cita(s) activa(s)
+                                    </span>
+                                    {% endif %}
+                                </div>
+                                <div class="text-muted small mt-1">
+                                    <i class="bi bi-telephone me-1"></i>{{ paciente.telefono }}
+                                    &nbsp;&bull;&nbsp;
+                                    <i class="bi bi-cake me-1"></i>{{ paciente.fecha_nacimiento }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-state py-5 text-center">
+                    <i class="bi bi-person-x display-4 text-muted d-block mb-3"></i>
+                    <h6 class="text-muted">No hay pacientes registrados</h6>
+                    <a href="{{ url_for('nuevo_paciente') }}" class="btn btn-info btn-sm mt-2">
+                        <i class="bi bi-plus-circle me-1"></i>Registrar primer paciente
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Doctores -->
+    <div class="col-lg-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-semibold">
+                    <i class="bi bi-person-badge-fill me-2 text-primary"></i>Doctores Disponibles
+                    <span class="badge bg-primary ms-2">{{ doctores|length }}</span>
+                </h5>
+                <a href="{{ url_for('nuevo_doctor') }}" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-plus-lg me-1"></i>Agregar
+                </a>
+            </div>
+            <div class="card-body p-0">
+                {% if doctores %}
+                <div class="list-group list-group-flush">
+                    {% for doctor in doctores %}
+                    {% set citas_activas = citas_por_doctor.get(doctor.id, 0) %}
+                    <div class="list-group-item px-4 py-3">
+                        <div class="d-flex align-items-start gap-3">
+                            <div class="avatar-md bg-primary text-white flex-shrink-0">
+                                {{ doctor.nombre[0]|upper }}
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="d-flex justify-content-between align-items-start gap-2">
+                                    <div class="fw-semibold">{{ doctor.nombre }}</div>
+                                    <!-- Botón eliminar doctor: POST con confirmación -->
+                                    <form method="post"
+                                          action="{{ url_for('eliminar_doctor', doctor_id=doctor.id) }}"
+                                          class="m-0"
+                                          onsubmit="return confirm(
+                                              '¿Eliminar al doctor {{ doctor.nombre|e }}?' +
+                                              {% if citas_activas > 0 %}
+                                              '\n\nADVERTENCIA: Tiene {{ citas_activas }} cita(s) activa(s) que serán canceladas automáticamente.'
+                                              {% else %}
+                                              '\n\nEsta acción no se puede deshacer.'
+                                              {% endif %}
+                                          );">
+                                        <button type="submit"
+                                                class="btn btn-sm btn-outline-danger"
+                                                title="Eliminar doctor">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                                <span class="badge-especialidad">
+                                    <i class="bi bi-heart-pulse me-1"></i>{{ doctor.especialidad }}
+                                </span>
+                                {% if citas_activas > 0 %}
+                                <span class="info-chip info-chip-warning ms-1">
+                                    <i class="bi bi-calendar-check me-1"></i>{{ citas_activas }} cita(s) activa(s)
+                                </span>
+                                {% endif %}
+                                <div class="text-muted small mt-1">
+                                    <i class="bi bi-telephone me-1"></i>{{ doctor.telefono }}
+                                    &nbsp;&bull;&nbsp;
+                                    <i class="bi bi-envelope me-1"></i>{{ doctor.email }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-state py-5 text-center">
+                    <i class="bi bi-person-x display-4 text-muted d-block mb-3"></i>
+                    <h6 class="text-muted">No hay doctores registrados</h6>
+                    <a href="{{ url_for('nuevo_doctor') }}" class="btn btn-primary btn-sm mt-2">
+                        <i class="bi bi-plus-circle me-1"></i>Registrar primer doctor
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

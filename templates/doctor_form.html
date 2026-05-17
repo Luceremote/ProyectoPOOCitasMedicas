@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+{% block title %}Registrar Doctor &mdash; MediCitas{% endblock %}
+
+{% block content %}
+
+<!-- Encabezado de página -->
+<div class="page-header mb-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{{ url_for('index') }}" class="text-decoration-none">
+                    <i class="bi bi-house me-1"></i>Inicio
+                </a>
+            </li>
+            <li class="breadcrumb-item active">Registrar Doctor</li>
+        </ol>
+    </nav>
+    <h1 class="page-title">
+        <i class="bi bi-person-badge-fill me-2 text-primary"></i>Registrar Nuevo Doctor
+    </h1>
+    <p class="text-muted mb-0">
+        Una vez registrado, el doctor estará disponible para asignar citas inmediatamente.
+    </p>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+
+        <!-- Indicador de paso -->
+        <div class="step-indicator mb-4">
+            <div class="step-item active">
+                <div class="step-circle">1</div>
+                <div class="step-label">Datos del doctor</div>
+            </div>
+        </div>
+
+        <!-- Formulario -->
+        <div class="card shadow-sm">
+            <div class="card-header py-3">
+                <h6 class="mb-0 fw-semibold text-muted">
+                    <i class="bi bi-clipboard2-pulse me-2"></i>Información del Doctor
+                </h6>
+            </div>
+            <div class="card-body p-4">
+                <form method="post" novalidate>
+
+                    <!-- ID -->
+                    <div class="form-group-custom mb-4">
+                        <label for="id" class="form-label-custom">
+                            <i class="bi bi-card-text me-2 text-primary"></i>ID profesional
+                            <span class="text-danger">*</span>
+                        </label>
+                        <input id="id"
+                               name="id"
+                               type="text"
+                               inputmode="numeric"
+                               pattern="\d+"
+                               data-numeric
+                               class="form-control form-control-lg"
+                               value="{{ datos.id if datos else '' }}"
+                               placeholder="Ej: 1023456789"
+                               title="Solo se permiten números (0-9)"
+                               required>
+                        <div class="form-hint">
+                            <i class="bi bi-info-circle me-1"></i>
+                            Solo números. Debe ser único y no estar registrado previamente.
+                        </div>
+                    </div>
+
+                    <!-- Nombre completo -->
+                    <div class="form-group-custom mb-4">
+                        <label for="nombre" class="form-label-custom">
+                            <i class="bi bi-person-fill me-2 text-primary"></i>Nombre completo
+                            <span class="text-danger">*</span>
+                        </label>
+                        <input id="nombre"
+                               name="nombre"
+                               type="text"
+                               class="form-control form-control-lg"
+                               value="{{ datos.nombre if datos else '' }}"
+                               placeholder="Ej: Dr. Juan Pérez / Dra. Ana López"
+                               required>
+                        <div class="form-hint">
+                            <i class="bi bi-info-circle me-1"></i>
+                            Incluya el título profesional (Dr. / Dra.).
+                        </div>
+                    </div>
+
+                    <!-- Especialidad -->
+                    <div class="form-group-custom mb-4">
+                        <label for="especialidad" class="form-label-custom">
+                            <i class="bi bi-heart-pulse-fill me-2 text-danger"></i>Especialidad médica
+                            <span class="text-danger">*</span>
+                        </label>
+                        <input id="especialidad"
+                               name="especialidad"
+                               type="text"
+                               class="form-control form-control-lg"
+                               value="{{ datos.especialidad if datos else '' }}"
+                               placeholder="Ej: Cardiología, Neurología, Pediatría..."
+                               required>
+                        <div class="form-hint">
+                            <i class="bi bi-info-circle me-1"></i>
+                            Área de práctica médica del doctor.
+                        </div>
+                    </div>
+
+                    <!-- Email y Teléfono -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <div class="form-group-custom">
+                                <label for="email" class="form-label-custom">
+                                    <i class="bi bi-envelope-fill me-2 text-info"></i>Email
+                                </label>
+                                <input id="email"
+                                       name="email"
+                                       type="email"
+                                       class="form-control form-control-lg"
+                                       value="{{ datos.email if datos else '' }}"
+                                       placeholder="doctor@clinica.com">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group-custom">
+                                <label for="telefono" class="form-label-custom">
+                                    <i class="bi bi-telephone-fill me-2 text-success"></i>Teléfono
+                                </label>
+                                <input id="telefono"
+                                       name="telefono"
+                                       type="text"
+                                       inputmode="numeric"
+                                       pattern="\d*"
+                                       data-numeric
+                                       class="form-control form-control-lg"
+                                       value="{{ datos.telefono if datos else '' }}"
+                                       placeholder="3001234567"
+                                       title="Solo se permiten números (0-9)">
+                                <div class="form-hint">
+                                    <i class="bi bi-info-circle me-1"></i>Solo números, sin espacios ni guiones.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Nota informativa -->
+                    <div class="alert alert-light border d-flex gap-2 mb-4" role="alert">
+                        <i class="bi bi-lightbulb-fill text-warning fs-5 flex-shrink-0"></i>
+                        <div class="small text-muted">
+                            Los campos marcados con <strong class="text-danger">*</strong> son obligatorios.
+                            El doctor quedará registrado en memoria mientras el servidor esté activo.
+                        </div>
+                    </div>
+
+                    <!-- Botones de acción -->
+                    <div class="d-flex gap-3">
+                        <button type="submit" class="btn btn-primary btn-lg px-5 flex-grow-1">
+                            <i class="bi bi-person-check-fill me-2"></i>Registrar Doctor
+                        </button>
+                        <a href="{{ url_for('index') }}" class="btn btn-outline-secondary btn-lg px-4">
+                            <i class="bi bi-arrow-left me-1"></i>Volver
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}
